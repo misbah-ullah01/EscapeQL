@@ -20,8 +20,8 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 | **Loby**        | NULL Puzzle       | Null Handeling, column comments, metadata queries             |
 | **Corridor**    | Broken View       | Views, `pg_views`, relational algebra, base tables            |
 | **Vault**       | Normalizatoin     | 2NF violation, functional dependencies, transactions          |
-| **Server Room** | Trigger Debugging | Triggers, `pg_triger`, debugging, concurrency (`SKIP_LOCKED`) |
-| **Escape**      | Encryption        | `pgcrupto`, `pgp_sym_decrypt`, key assembly                   |
+| **Server Room** | Trigger Debugging | Triggers, `pg_trigger`, debugging, concurrency (`SKIP_LOCKED`) |
+| **Escape**      | Encryption        | `pgcrypto`, `pgp_sym_decrypt`, key assembly                   |
 
 ---
 
