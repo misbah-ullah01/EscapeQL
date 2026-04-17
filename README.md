@@ -94,7 +94,7 @@ This project is excellent for teaching:
 
 ## Future Improvements
 
-- MUltiplayer support with real-time updates
+- Multiplayer support with real-time updates
 - Docker Compose setup for easier deployment
 - Admin dashboard for instructors
 - Difficulty levels / hints system
@@ -105,6 +105,8 @@ This project is excellent for teaching:
 ## License
 
 MIT License
+
+_Copyright (c) 2026 Misbah Ullah_
 
 Feel Free to Fork, modify, and use it in your classes or personal Learning
 
