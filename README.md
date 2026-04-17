@@ -31,4 +31,24 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 - Real PostgreSQL backend with multiple shemas acting as "rooms"
 - Role-based security (`warden`, `prisoner`)
 - Secure answer validation using hashed passwords
--
+- Progress tracking, fragments collections, and leaderboard
+- Safe query executor (blocks dangerous commands)
+- Responsive Pixelated/Terminal/Game aesthetic
+- Complete reset script for easy replay
+
+---
+
+## Tech Stach
+
+- **Database**: PostgreSQL 16
+- **Backend**: Node.js + Express + pg
+- **Frontend**: Vanilla HTML, CSS, JavaScript
+- **Authentication**: Session-based
+- **Security**: Row-Level Security (RLS), `SECURITY DEFINER` functions, parameterized queries
+
+---
+
+## Project Structure
+
+```bash
+escapeql/
