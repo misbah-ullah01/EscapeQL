@@ -76,3 +76,27 @@ escapeql/
 ```
 
 ---
+
+## Teaching / Classroom Use
+
+This project is excellent for teaching:
+- Relational Database Design
+- SQL Query writing & Optimization
+- Database Security (Roles, Privileges, RLS)
+- Transactions & Concurrency
+- Triggers & Stored Procedures
+- PostgreSQL System Catalogs(`pg_views`, `pg_triggers`, etc.)
+- Normalization & Functional Dependencies
+- Encryption with `pgcrypto`
+
+---
+
+## Future Improvements
+
+- MUltiplayer support with real-time updates
+- Docker Compose setup for easier deployment
+- Admin dashboard for instructors
+- Difficulty levels / hints system
+- Score based on time and attempts
+
+## 
