@@ -15,13 +15,13 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 
 **Rooms & Concepts Taught:**
 
-| Room          | Theme             | Core Concepts taught                              |
-|---------------|-------------------|------------------------------------|
-|**Loby**       | NULL Puzzle       | Null Handeling, column comments, metadata queries                    |
-|**Corridor**   |Broken View        |Views, `pg_views`, relational algebra, base tables                |
-|**Vault**      |Normalizatoin      |2NF violation, functional dependencies, transactions          |
-|**Server Room**|Trigger Debugging  |Triggers, `pg_triger`, debugging, concurrency (`SKIP_LOCKED`)         |
-|**Escape**     |Encryption         |`pgcrupto`, `pgp_sym_decrypt`, key assembly                            |
+| Room            | Theme             | Core Concepts taught                                          |
+| --------------- | ----------------- | ------------------------------------------------------------- |
+| **Loby**        | NULL Puzzle       | Null Handeling, column comments, metadata queries             |
+| **Corridor**    | Broken View       | Views, `pg_views`, relational algebra, base tables            |
+| **Vault**       | Normalizatoin     | 2NF violation, functional dependencies, transactions          |
+| **Server Room** | Trigger Debugging | Triggers, `pg_triger`, debugging, concurrency (`SKIP_LOCKED`) |
+| **Escape**      | Encryption        | `pgcrupto`, `pgp_sym_decrypt`, key assembly                   |
 
 ---
 
@@ -52,3 +52,27 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 
 ```bash
 escapeql/
+├── database/              # All SQL setup files
+│   ├── 00_setup.sql
+│   ├── 01_warden_schema.sql
+│   ├── 02_lobby.sql
+│   ├── 03_corridor.sql
+│   ├── 04_vault.sql
+│   ├── 05_server_room.sql
+│   ├── 06_escape.sql
+│   ├── 07_permissions.sql
+│   └── reset.sql
+├── backend/
+│   ├── server.js
+│   ├── db.js
+│   ├── routes/
+│   └── package.json
+├── frontend/
+│   ├── index.html
+│   ├── game.html
+│   ├── css/
+│   └── js/
+└── README.md
+```
+
+---
