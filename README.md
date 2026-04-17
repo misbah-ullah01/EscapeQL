@@ -80,6 +80,7 @@ escapeql/
 ## Teaching / Classroom Use
 
 This project is excellent for teaching:
+
 - Relational Database Design
 - SQL Query writing & Optimization
 - Database Security (Roles, Privileges, RLS)
@@ -99,4 +100,22 @@ This project is excellent for teaching:
 - Difficulty levels / hints system
 - Score based on time and attempts
 
-## 
+---
+
+## License
+
+MIT License
+
+Feel Free to Fork, modify, and use it in your classes or personal Learning
+
+---
+
+## Acknowledgements
+
+- Built as a fun way to teach advanced PostgreSql concepts
+- Inspired by classic escape room games and SQL learning platforms
+
+---
+
+_***Made with ❤️ for database learners everywhere***_
+_Start Escaping_
