@@ -120,4 +120,5 @@ Feel Free to Fork, modify, and use it in your classes or personal Learning
 ---
 
 _***Made with ❤️ for database learners everywhere***_
+
 _Start Escaping_
