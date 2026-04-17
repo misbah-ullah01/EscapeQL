@@ -15,20 +15,20 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 
 **Rooms & Concepts Taught:**
 
-| Room            | Theme             | Core Concepts taught                                          |
-| --------------- | ----------------- | ------------------------------------------------------------- |
-| **Loby**        | NULL Puzzle       | Null Handeling, column comments, metadata queries             |
-| **Corridor**    | Broken View       | Views, `pg_views`, relational algebra, base tables            |
-| **Vault**       | Normalizatoin     | 2NF violation, functional dependencies, transactions          |
+| Room            | Theme             | Core Concepts taught                                           |
+| --------------- | ----------------- | -------------------------------------------------------------- |
+| **Loby**        | NULL Puzzle       | Null Handeling, column comments, metadata queries              |
+| **Corridor**    | Broken View       | Views, `pg_views`, relational algebra, base tables             |
+| **Vault**       | Normalizatoin     | 2NF violation, functional dependencies, transactions           |
 | **Server Room** | Trigger Debugging | Triggers, `pg_trigger`, debugging, concurrency (`SKIP_LOCKED`) |
-| **Escape**      | Encryption        | `pgcrypto`, `pgp_sym_decrypt`, key assembly                   |
+| **Escape**      | Encryption        | `pgcrypto`, `pgp_sym_decrypt`, key assembly                    |
 
 ---
 
 ## Features
 
 - Fully Functional web frontend with SQL terminal
-- Real PostgreSQL backend with multiple shemas acting as "rooms"
+- Real PostgreSQL backend with multiple schemas acting as "rooms"
 - Role-based security (`warden`, `prisoner`)
 - Secure answer validation using hashed passwords
 - Progress tracking, fragments collections, and leaderboard
