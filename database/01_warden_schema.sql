@@ -32,5 +32,13 @@ CREATE TABLE IF NOT EXISTS warden.room_log(
 
 -- ===================================================
 
+CREATE TABLE IF NOT EXISTS warden.answers (
+	room_name 				VARCHAR(50) PRIMARY KEY,
+	answer_hash 			TEXT NOT NULL,			-- SHA-256 hash of the real answer
+	unlock_target 			VARCHAR(50) NOT NULL,	-- which schema/room to unclock on success
+	key_fragments 			VARCHAR(50) NOT NULL	-- Piece of the final escape key
+);
+
+-- ===================================================
 
 
