@@ -76,3 +76,22 @@ VALUES
 ON CONFLICT (room_name) DO NOTHING;
 
 -- ===================================================
+
+-- Now to give warden full permission on everything we created
+
+GRANT ALL ON ALL TABLES IN SCHEMA warden TO warden;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA warden TO warden;
+
+-- ===================================================
+
+CREATE OR REPLACE VIEW warden.player_progress AS 
+SELECT
+	p.username,
+	p.current_room,
+	(p.completed_at IS NOT NULL) AS has_escaped,
+	COUNT(rl.log_id) AS rooms_completed
+FROM warden.players p
+LEFT JOIN warden.room_log rl ON rl.player_id = p.player_id
+GROUP BY p.player_id, p.username, p.current_room, p.completed_at;
+
+-- ===================================================
