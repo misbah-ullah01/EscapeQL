@@ -38,7 +38,7 @@ Your only tools are web-based SQL terminal and your knowledge of PostgreSQL.
 
 ---
 
-## Tech Stach
+## Tech Stack
 
 - **Database**: PostgreSQL 16
 - **Backend**: Node.js + Express + pg
