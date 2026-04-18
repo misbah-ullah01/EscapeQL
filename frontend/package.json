@@ -1,15 +1,16 @@
 {
-  "name": "frontend",
+  "name": "escapeql-frontend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "EscapeQL - The database IS the game",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": [],
+  "keywords": ["escapeql", "database", "game"],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0"
   }
 }
