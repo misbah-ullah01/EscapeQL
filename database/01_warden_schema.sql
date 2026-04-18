@@ -41,4 +41,11 @@ CREATE TABLE IF NOT EXISTS warden.answers (
 
 -- ===================================================
 
-
+CREATE TABLE IF EXISTS warden.attempt_log (
+	id 				SERIAL PRIMARY KEY,
+	player_id 		INT REFERENCES warden.players(player_id),
+	room_name 		VARCHAR(50),
+	submitted 		TEXT,			-- What players actually typed
+	correct 		BOOLEAN,
+	attempted_at 	TIMESTAMPTZ DEFAULT NOW()
+);
