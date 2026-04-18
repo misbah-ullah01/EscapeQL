@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS warden.answers (
 
 -- ===================================================
 
-CREATE TABLE IF EXISTS warden.attempt_log (
+CREATE TABLE IF NOT EXISTS warden.attempt_log (
 	id 				SERIAL PRIMARY KEY,
 	player_id 		INT REFERENCES warden.players(player_id),
 	room_name 		VARCHAR(50),
@@ -52,27 +52,12 @@ CREATE TABLE IF EXISTS warden.attempt_log (
 
 -- ===================================================
 
-INSERT INTO warden.answers (room_name, answer_hash, unlock_target, key_fragments)
+INSERT INTO warden.answers (room_name, answer_hash, unlock_target, key_fragment)
 VALUES
-	('lobby',
-	encode(digest('MARCUS_VOID_KNOWS', 'sha256'), 'hex'),
-	'corridor',
-	'ALPHA'),
-
-	('corridor',
-	encode(digest('DOOR_SEVEN_FOUND', 'sha256'), 'hex'),
-	'vault',
-	'BRAVO'),
-
-	('vault',
-	encode(digest('4471-DELTA', 'sha256'), 'hex'),
-	'server_room',
-	'CHARLIE'),
-
-	('server_room',
-	encode(digest('HATCH_UNLOCKED', 'sha256'), 'hex'),
-	'escape',
-	'DELTA')
+    ('lobby',        encode(digest('MARCUS_VOID_KNOWS', 'sha256'), 'hex'), 'corridor',    'ALPHA'),
+    ('corridor',     encode(digest('DOOR_SEVEN_FOUND', 'sha256'), 'hex'),  'vault',       'BRAVO'),
+    ('vault',        encode(digest('4471-DELTA', 'sha256'), 'hex'),        'server_room', 'CHARLIE'),
+    ('server_room',  encode(digest('HATCH_UNLOCKED', 'sha256'), 'hex'),   'escape',      'DELTA')
 ON CONFLICT (room_name) DO NOTHING;
 
 -- ===================================================

@@ -22,7 +22,7 @@ CREATE ROLE prisoner WITH
 	PASSWORD 'pris-1234';
 
 -- Enable required extensions
--- pgcrypto gives us encryption fundtions
+-- pgcrypto gives us encryption functions
 
 -- First, check if pgcrypto is available at all
 SELECT * FROM pg_available_extensions WHERE name = 'pgcrypto';
