@@ -49,3 +49,30 @@ CREATE TABLE IF EXISTS warden.attempt_log (
 	correct 		BOOLEAN,
 	attempted_at 	TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ===================================================
+
+INSERT INTO warden.answers (room_name, answer_hash, unlock_target, key_fragments)
+VALUES
+	('lobby',
+	encode(digest('MARCUS_VOID_KNOWS', 'sha256'), 'hex'),
+	'corridor',
+	'ALPHA'),
+
+	('corridor',
+	encode(digest('DOOR_SEVEN_FOUND', 'sha256'), 'hex'),
+	'vault',
+	'BRAVO'),
+
+	('vault',
+	encode(digest('4471-DELTA', 'sha256'), 'hex'),
+	'server_room',
+	'CHARLIE'),
+
+	('server_room',
+	encode(digest('HATCH_UNLOCKED', 'sha256'), 'hex'),
+	'escape',
+	'DELTA')
+ON CONFLICT (room_name) DO NOTHING;
+
+-- ===================================================
