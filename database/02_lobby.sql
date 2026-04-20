@@ -42,3 +42,18 @@ CREATE TABLE lobby.hint_board (
 );
 
 -- =================================================
+
+INSERT INTO lobby.staff_directory (name, department, access_code, clue)
+VALUES
+	('Alice Chen',      'Engineering',  'AC-1042', 'Keep moving.'),
+    ('Bob Rahman',      'Security',     'BR-2891', 'Wrong door.'),
+    ('Carol Patel',     'HR',           'CP-3301', 'Not here.'),
+    ('David Kim',       'Finance',      'DK-4412', 'Try again.'),
+    ('Emma Torres',     'Legal',        'ET-5523', 'Cold.'),
+    ('Frank Osei',      'Operations',   'FO-6634', 'Warmer?'),
+    ('Grace Liu',       'IT',           'GL-7745', 'Not quite.'),
+    ('Henry Mwangi',    'Facilities',   'HM-8856', 'Almost.'),
+    ('Iris Johansson',  'Marketing',    'IJ-9967', 'Look harder.'),
+    ('James Nakamura',  'Research',     'JN-1078', 'You are close.'),
+    ('Karen Okafor',    'Procurement',  'KO-2189', 'One more.'),
+    ('Marcus Void',     'Unknown',      NULL,       'I was never really here.');
