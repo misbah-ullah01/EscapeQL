@@ -57,3 +57,12 @@ VALUES
     ('James Nakamura',  'Research',     'JN-1078', 'You are close.'),
     ('Karen Okafor',    'Procurement',  'KO-2189', 'One more.'),
     ('Marcus Void',     'Unknown',      NULL,       'I was never really here.');
+
+-- =================================================
+
+-- Hint board: only Marcus Void's row matters
+
+INSERT INTO lobby.hint_board (staff_name, message, passphrase)
+VALUES
+	('Marcus Void', 'You Found me. The corridor opens with the word below.', 
+	 'MARCUS_VOID_KNOWS');
