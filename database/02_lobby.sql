@@ -96,9 +96,46 @@ BEGIN
 
 	--Check if correct
 	IF v_submitted_hash = v_expected_hash THEN
-	-- Unlock corridor for this player
-	EXECUTE 'GRANT USAGE ON SCHEMA corridor TO prisoner';
-	EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA corridor TO prisoner';
+		-- Unlock corridor for this player
+		EXECUTE 'GRANT USAGE ON SCHEMA corridor TO prisoner';
+		EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA corridor TO prisoner';
+	
+		-- Log the room completeion
+		INSERT INTO warden.room_log (player_id, room_name)
+		VALUES (p_player_id, 'lobby')
+		ON CONFLICT DO NOTHING;
+	
+		-- Update player's current room
+		UPDATE warden.players
+		SET current_room = 'corridor'
+		WHERE player_id = p_player_id;
+	
+		-- Notify warden terminal
+		PERFORM pg_notify (
+			'room_unlocked',
+			json_build_object(
+				'player_id', p_player_id,
+				'room', 'lobby',
+				'unlocked', 'corridor',
+				'at', NOW()
+			)::TEXT
+		);
+	
+		RETURN json_build_object(
+			'succes', TRUE,
+			'message', 'Correct. The corridor is open.',
+			'fragment', v_fragment,
+			'next_room', 'corridor'
+		);
+	ELSE 
+		RETURN json_build_object(
+			'success', FALSE,
+			'message', 'Wrong. The door does not move.',
+			'fragment', NULL
+		);
+	END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-	-- Log the room completeion
+GRANT EXECUTE ON FUNCTION lobby.attemp_unlock(INT, TEXT) TO prisoner;
 	
