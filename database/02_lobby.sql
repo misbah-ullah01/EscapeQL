@@ -18,7 +18,7 @@ CREATE TABLE lobby.staff_directory (
 	name 		VARCHAR(50) NOT NULL,
 	department 	VARCHAR(50),
 	access_code	VARCHAR(20),
-	clue		TECT,
+	clue		TEXT,
 	active		BOOLEAN DEFAULT TRUE
 );
 
@@ -75,7 +75,7 @@ CREATE OR REPLACE FUNCTION lobby.attempt_unlock(
 	p_passphrase TEXT
 )
 
-RETURN JSON AS $$
+RETURNS JSON AS $$
 DECLARE
 	v_expected_hash TEXT;
 	v_submitted_hash TEXT;
@@ -137,5 +137,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION lobby.attemp_unlock(INT, TEXT) TO prisoner;
+GRANT EXECUTE ON FUNCTION lobby.attempt_unlock(INT, TEXT) TO prisoner;
 	
