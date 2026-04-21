@@ -66,3 +66,39 @@ INSERT INTO lobby.hint_board (staff_name, message, passphrase)
 VALUES
 	('Marcus Void', 'You Found me. The corridor opens with the word below.', 
 	 'MARCUS_VOID_KNOWS');
+
+-- =================================================
+-- Function for lobby attep on unlock by player
+
+CREATE OR REPLACE FUNCTION lobby.attempt_unlock(
+	p_player_id INT,
+	p_passphrase TEXT
+)
+
+RETURN JSON AS $$
+DECLARE
+	v_expected_hash TEXT;
+	v_submitted_hash TEXT;
+	v_fragment TEXT;
+BEGIN
+	-- Get the expexted hash from Warden
+	SELECT answer_hash, key_fragment
+	INTO v_expected_hash, v_fragment
+	FROM warden.answers
+	WHERE room_name = 'lobby';
+
+	-- Hash what the player submitted
+	v_submitted_hash := encode(digest(p_passphrase, 'sha256'), 'hex');
+	
+	-- Log this attempt regardless of outcome
+	INSERT INTO warden.attempt_log (player_id, room_name, submitted, correct)
+	VALUES (p_player_id, 'lobby', p_passphrase, v_submitted_hash = v_expected_hash);
+
+	--Check if correct
+	IF v_submitted_hash = v_expected_hash THEN
+	-- Unlock corridor for this player
+	EXECUTE 'GRANT USAGE ON SCHEMA corridor TO prisoner';
+	EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA corridor TO prisoner';
+
+	-- Log the room completeion
+	
