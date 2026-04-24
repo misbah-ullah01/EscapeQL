@@ -41,3 +41,32 @@ COMMENT ON VIEW corridor.camera_feeds
 
 -- =================================================
 
+INSERT INTO corridor.door_log (location, status, active, secret_code) VALUES
+    ('North Wing A',    'LOCKED',    TRUE,  NULL),
+    ('North Wing B',    'LOCKED',    TRUE,  NULL),
+    ('East Stairwell',  'LOCKED',    TRUE,  NULL),
+    ('Server Corridor', 'LOCKED',    TRUE,  NULL),
+    ('Emergency Exit',  'LOCKED',    TRUE,  NULL),
+    ('Basement Access', 'LOCKED',    TRUE,  NULL),
+    ('Maintenance Bay', 'UNLOCKED',  FALSE, 'DOOR_SEVEN_FOUND'),
+    -- ^^^ Door 7 is active=FALSE and has the secret code
+    ('South Hallway',   'LOCKED',    TRUE,  NULL),
+    ('West Wing',       'LOCKED',    TRUE,  NULL),
+    ('Archive Room',    'LOCKED',    TRUE,  NULL);
+
+-- =================================================
+
+INSERT INTO corridor.maintenance_notes (door_id, note_text, technician, note_date) VALUES
+    (1,  'Routine check. All clear.',            'T. Brown',   '2024-01-10'),
+    (2,  'Hinge replaced.',                      'T. Brown',   '2024-01-11'),
+    (3,  'Camera offline, fixed.',               'K. Mills',   '2024-01-12'),
+    (4,  'Keypad battery replaced.',             'K. Mills',   '2024-01-13'),
+    (5,  'Emergency bar tested.',                'T. Brown',   '2024-01-14'),
+    (6,  'Basement access restricted.',          'Management', '2024-01-15'),
+    (7,  'Door decommissioned. Do not use.',     'Unknown',    '2024-01-01'),
+    -- ^^^ The "Unknown" technician and "decommissioned" is another hint
+    (8,  'Routine check.',                       'K. Mills',   '2024-01-16'),
+    (9,  'Lock serviced.',                       'T. Brown',   '2024-01-17'),
+    (10, 'Archive sealed per policy directive.', 'Management', '2024-01-18');
+
+-- =================================================
