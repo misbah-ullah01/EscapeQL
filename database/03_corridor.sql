@@ -70,3 +70,35 @@ INSERT INTO corridor.maintenance_notes (door_id, note_text, technician, note_dat
     (10, 'Archive sealed per policy directive.', 'Management', '2024-01-18');
 
 -- =================================================
+
+-- Unlock feature for corridor
+CREATE OR REPLACE FUNCTION corridor.attempt_unlock(
+    p_player_id INT,
+    p_code TEXT
+)
+RETURNS JSON AS $$
+DECLARE
+    v_expected_hash TEXT;
+    v_submitted_hash TEXT;
+    v_fragment TEXT
+BEGIN
+    SELECT answer_hash, key_fragments INTO v_expected_hash, v_fragment
+    FROM warden.answers WHERE room_name = 'corridor';
+
+    v_submitted_hash := encode(digest(p_code, 'sha256'), 'hex');
+
+    INSERT INTO warden.attempt_log (p_player_id, room_name, submitted_correct)
+    VALUES (p_player_id, 'corridor', p_code, v_submitted_hash = v_expected_hash);
+
+    IF v_submitted_hash = v_expected_hash THEN
+        EXECUTE 'GRANT USAGE ON SCHEMA vault TO prisoner';
+        EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA vault TO prisoner';
+        EXECUTE 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA vault TO prisoner';
+
+        INSERT INTO warden.room_log (player_id, room_name)
+        VALUES (p_player_id, 'corridor') ON CONFLICT DO NOTHING;
+
+        UPDATE warden.players SET current_room = 'vault'
+        WHERE player_id = p_player_id;
+
+        
