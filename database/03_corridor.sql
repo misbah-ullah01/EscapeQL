@@ -101,4 +101,24 @@ BEGIN
         UPDATE warden.players SET current_room = 'vault'
         WHERE player_id = p_player_id;
 
-        
+        PERFORM pg_notify('room_unlocked',
+            json_build_object('player_id', p_player_id,
+            'room', 'corridor', 'at', NOW())::TEXT);
+
+        RETURN json_build_object('success', TRUE,
+            'message', 'The vault door slides open.',
+            'fragment', v_fragment, 'nect_room', 'vault');
+    ELSE
+        RETURN json_build_object('success', FALSE,
+            'message', 'The corridor stays dark.', 'fragment', NUL);
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION corridor.attempt_unclock(INT, TEXT) TO prisoner;
+
+-- Grant prisoner read access to pg_views (needed to solve this puzzle)
+GRANT SELECT ON pg_views TO prisoner;
+
+
+
