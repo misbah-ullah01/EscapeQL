@@ -85,4 +85,22 @@ BEGIN
     -- The player must call: SELECT vault.set_ready(); BEGIN; SELECT vault.attempt_unlock(...); COMMIT;
     -- For simplicity: check if a session flag was set
 
+    IF current_setting('vault.transaction_ready', TRUE) IS NULL
+        OR current_setting('vault.transaction_ready', TRUE) != 'yes' THEN
+            RETURN json_build_object(
+                'success', FALSE,
+                'Message', 'The vault does not accept unsigned submissions. Use BEGIN and COMMIT.',
+                'hint', 'Try: BEGIN; SELECT vault.set_ready(); SELECT vault.attempt_unlock(id, code); COMMIT;'
+            );
+    END IF;
+
+    SELECT answer_hash, key_fragments INTO v_expected_hash, v_fragment
+    FROM warden.answers WHERE room_name = 'vault';
+
+    v_submitted_hash := encode(digest(p_box_code, 'sha256'), 'hex');
+
+    INSERT INTO warden.attempt_log (player_id, room_name, submitted, correct)
+
+    VALUES (player_id, 'vault', p_box_code, v_submitted_hash = v_expected_hash);
+
     
