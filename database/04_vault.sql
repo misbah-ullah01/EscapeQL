@@ -135,3 +135,15 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Helper function the player must call inside their transaction
+CREATE OR REPLACE FUNCTION vault.set_ready()
+RETURNS TEXT AS $$
+BEGIN
+    PERFORM set_config('vault.transaction_ready', 'yes', TRUE);
+    RETURN 'Transaction acknowledged. Now submit your answer.';
+END;
+$$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION vault.attempt_unlock(INT, TEXT) TO prisoner;
+GRANT EXECUTE ON FUNCTION vault.set_ready() TO prisoner;
