@@ -103,4 +103,35 @@ BEGIN
 
     VALUES (player_id, 'vault', p_box_code, v_submitted_hash = v_expected_hash);
 
-    
+    IF v_submitted_hash = v_expected_hash THEN
+        -- mark the box as checked out (satisfying the transaction requirement)
+        UPDATE vault.safety_deposit_boxes
+        SET checked_out = TRUE
+        WHERE box_code = p_box_code;
+
+        EXECUTE 'GRANT USAGE ON SCHEMA server_room TO prisoner';
+        EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA server_room TO prisoner';
+        EXECUTE 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA server_room TO prisoner';
+
+        INSERT INTO warden.room_log (player_id, room_name)
+        VALUES (p_player_id, 'vault') ON CONFLICT DO NOTHING;
+
+        UPDATE warden.playes SET current_room = 'server_room'
+        WHERE player_id = p_player_id;
+
+        PERFORM pg_notify('room_unlocked',
+            json_build_object('player_id', p_player_id,
+                'room', 'vault', 'at', NOW())::TEXT);
+
+        -- Reset the flag
+        PERFORM set_config('vault.transaction_ready', '', TRUE);
+
+        RETURN json_build_object('success', TRUE,
+            'message', 'Box cleared. The server room door opens.',
+            'fragment', v_fragment, 'next_room', 'server_room');
+    ELSE
+        ETURN json_build_object('success', FALSE,
+            'message', 'Wrong code. The vault stays sealed.', 'fragment', NULL);
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
