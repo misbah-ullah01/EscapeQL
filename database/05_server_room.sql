@@ -1,13 +1,11 @@
-CREATE SCHEMA server_room;
-
 -- File: database/05_server_room.sql
 
 CREATE SCHEMA server_room;
 
 -- ─────────────────────────────────────────────────────────
+-- Table: server_room.authorization_log
 -- Player inserts a row with status='AUTHORIZED' to trigger unlock
 -- ─────────────────────────────────────────────────────────
-
 CREATE TABLE server_room.authorization_log (
     log_id     SERIAL PRIMARY KEY,
     auth_id    VARCHAR(50) NOT NULL,   -- this column was RENAMED from clearance_id
