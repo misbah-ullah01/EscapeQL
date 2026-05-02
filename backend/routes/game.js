@@ -187,4 +187,28 @@ router.get('/leaderboard', async (req, res) => {
     }
 });
 
+// POST /api/game/busted
+// Resets player progress after 7 failed attempts
+router.post('/busted', async (req, res) => {
+    const playerId = req.session.playerId;
+    const client = await wardenPool.connect();
+    try {
+        await client.query('BEGIN');
+        // Reset room and completetion
+        await client.query(`UPDATE warden.players SET current_room = 'Lobby', completed_at = NULL WHERE player_id = $1`, [playerId]);
+        // Remove completion logs
+        await client.query(`DELETE FROM warden.room_log WHERE player_id = $1`, [playerId]);
+        // Remove attempt logs
+        await client.query(`DELETE FROM warden.attempt_log WHERE player_id = $1`, [playerId]);
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Player busted and reset.' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Busted reset error:', err.message);
+        res.status(500).json({ error: 'Failed to reset busted player' });
+    } finally {
+        client.release();
+    }
+});
+
 module.exports = router;

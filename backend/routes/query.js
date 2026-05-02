@@ -19,15 +19,16 @@ router.use(requireLogin);
 // Runs a SQL query as the prisoner role
 // Body: { sql: 'SELECT * FROM lobby.staff_directory' }
 router.post('/run', async (req, res) => {
-    const { sql } = req.body;
+    const { sql, query } = req.body;
+    const statement = (sql || query || '').trim();
 
-    if (!sql || sql.trim() === '') {
+    if (!statement) {
         return res.status(400).json({ error: 'No SQL provided' });
     }
 
     // Basic safety check: block dangerous statements
     // This is NOT foolproof - it is a teaching aid, not production security
-    const upperSQL = sql.trim().toUpperCase();
+    const upperSQL = statement.toUpperCase();
     const blocked = ['DROP ', 'TRUNCATE ', 'DELETE ', 'CREATE ROLE', 'ALTER ROLE',
                      'GRANT ', 'REVOKE ', 'COPY ', 'DO $$'];
 
@@ -44,7 +45,7 @@ router.post('/run', async (req, res) => {
 
     const start = Date.now();
     try {
-        const result = await prisonerPool.query(sql);
+        const result = await prisonerPool.query(statement);
         const duration = Date.now() - start;
 
         res.json({

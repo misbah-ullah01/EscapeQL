@@ -3,11 +3,12 @@ const express       = require('express');
 const session       = require('express-session');
 const cors          = require('cors');
 const path          = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const authRoutes    = require('./routes/auth');
 const gameRoutes    = require('./routes/game');
 const queryRoutes   = require('./routes/query');
+const wardenRoutes  = require('./routes/warden');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -16,9 +17,19 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());  // parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // parse form data
 
-// CORS: allow frontend (port 5500 or 3000) to call this backend (port 3001)
+// Some classroom setups open the frontend from file://, which sends Origin: null.
+app.use((req, res, next) => {
+    if (req.headers.origin === 'null') {
+        res.setHeader('Access-Control-Allow-Origin', 'null');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    }
+    next();
+});
+
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:3000'],
+    origin: true,
     credentials: true  // allow cookies (needed for sessions)
 }));
 
@@ -41,6 +52,7 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/api/auth',  authRoutes);
 app.use('/api/game',  gameRoutes);
 app.use('/api/query', queryRoutes);
+app.use('/api/warden', wardenRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

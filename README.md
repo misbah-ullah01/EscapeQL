@@ -122,3 +122,5 @@ Feel Free to Fork, modify, and use it in your classes or personal Learning
 _***Made with ❤️ for database learners everywhere***_
 
 _Start Escaping_
+
+If you open the game directly from the filesystem, use the backend server at `http://localhost:3001/` so registration and sessions work correctly.

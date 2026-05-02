@@ -3,7 +3,8 @@
 // one for the prisoner role, one for the warden role
 
 const { Pool } = require('pg');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Pool = a collection of reusable database connections
 // Instead of opening a new connection for every request (slow),
@@ -33,13 +34,22 @@ const wardenPool = new Pool({
     connectionTimeoutMillis: 2000,
 });
 
-// Test connection on startup
+// Test connections on startup
 prisonerPool.connect((err, client, release) => {
     if (err) {
         console.error('Failed to connect prisoner pool:', err.message);
     } else {
         console.log('Prisoner pool connected to PostgreSQL');
         release(); // always release the client back to pool
+    }
+});
+
+wardenPool.connect((err, client, release) => {
+    if (err) {
+        console.error('Failed to connect warden pool:', err.message);
+    } else {
+        console.log('Warden pool connected to PostgreSQL');
+        release();
     }
 });
 
