@@ -38,6 +38,9 @@ REVOKE ALL ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON DATABASE escape_room TO warden;
 GRANT ALL ON SCHEMA public TO warden;
 
+-- Prisoner needs CONNECT so the query interface can run with limited role
+GRANT CONNECT ON DATABASE escape_room TO prisoner;
+
 SELECT * FROM pg_tables
 
 
