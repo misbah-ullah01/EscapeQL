@@ -3,7 +3,7 @@
 
 const express = require('express');
 const router  = express.Router();
-const { wardenPool } = require('../db');
+const { prisonerPool, wardenPool } = require('../db');
 
 // Middleware: require login for all game routes
 const requireLogin = (req, res, next) => {
@@ -91,13 +91,15 @@ function isRoomUnlocked(room, completedRooms) {
 router.post('/unlock', async (req, res) => {
     const { room, answer } = req.body;
     const playerId = req.session.playerId;
+    const normalizedRoom = (room || '').toString().trim().toLowerCase();
+    const normalizedAnswer = (answer || '').toString().trim().toUpperCase();
 
-    if (!room || !answer) {
+    if (!normalizedRoom || !normalizedAnswer) {
         return res.status(400).json({ error: 'room and answer are required' });
     }
 
     const validRooms = ['lobby', 'corridor', 'vault', 'server_room'];
-    if (!validRooms.includes(room)) {
+    if (!validRooms.includes(normalizedRoom)) {
         return res.status(400).json({ error: 'Invalid room name' });
     }
 
@@ -105,15 +107,15 @@ router.post('/unlock', async (req, res) => {
         let result;
         // Each room has its own unlock function
         // vault needs special transaction handling
-        if (room === 'vault') {
+        if (normalizedRoom === 'vault') {
             // Simulate the transaction requirement for vault
-            const client = await wardenPool.connect();
+            const client = await prisonerPool.connect();
             try {
                 await client.query('BEGIN');
                 await client.query("SELECT set_config('vault.transaction_ready', 'yes', TRUE)");
                 result = await client.query(
                     'SELECT vault.attempt_unlock($1, $2) AS result',
-                    [playerId, answer]
+                    [playerId, normalizedAnswer]
                 );
                 await client.query('COMMIT');
             } catch (e) {
@@ -122,15 +124,15 @@ router.post('/unlock', async (req, res) => {
             } finally {
                 client.release();
             }
-        } else if (room === 'server_room') {
-            result = await wardenPool.query(
+        } else if (normalizedRoom === 'server_room') {
+            result = await prisonerPool.query(
                 'SELECT server_room.attempt_unlock($1) AS result',
                 [playerId]
             );
         } else {
-            result = await wardenPool.query(
-                `SELECT ${room}.attempt_unlock($1, $2) AS result`,
-                [playerId, answer]
+            result = await prisonerPool.query(
+                `SELECT ${normalizedRoom}.attempt_unlock($1, $2) AS result`,
+                [playerId, normalizedAnswer]
             );
         }
 
@@ -152,7 +154,7 @@ router.post('/escape', async (req, res) => {
     if (!key) return res.status(400).json({ error: 'key is required' });
 
     try {
-        const result = await wardenPool.query(
+        const result = await prisonerPool.query(
             'SELECT escape.complete_game($1, $2) AS result',
             [playerId, key]
         );

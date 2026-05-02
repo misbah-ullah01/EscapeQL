@@ -23,9 +23,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
     background-size: 100% 4px;
-    z-index: 100;
+    z-index: 0; /* put scanlines behind UI to avoid covering headers/footers */
+    mix-blend-mode: multiply; /* reduce any light/white overlay artifacts */
     pointer-events: none;
 }
 

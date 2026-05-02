@@ -114,6 +114,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION corridor.attempt_unlock(INT, TEXT) TO prisoner;
 
+GRANT USAGE ON SCHEMA corridor TO prisoner;
+GRANT SELECT ON ALL TABLES IN SCHEMA corridor TO prisoner;
+
 GRANT SELECT ON pg_views TO prisoner;
 
 

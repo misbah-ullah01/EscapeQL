@@ -2,6 +2,9 @@ const API_BASE = window.location.origin.includes('3001')
     ? `${window.location.origin}/api`
     : 'http://localhost:3001/api';
 
+let prisonerPoller = null;
+let attemptPoller = null;
+
 // Time update
 setInterval(() => {
     const now = new Date();
@@ -66,7 +69,13 @@ function showDashboard() {
     document.getElementById('warden-login-view').classList.add('hidden');
     document.getElementById('warden-dashboard-view').classList.remove('hidden');
     fetchPrisonerData();
-    setInterval(fetchPrisonerData, 5000); // Polling every 5s
+    fetchAttemptTelemetry();
+
+    if (prisonerPoller) clearInterval(prisonerPoller);
+    if (attemptPoller) clearInterval(attemptPoller);
+
+    prisonerPoller = setInterval(fetchPrisonerData, 5000);
+    attemptPoller = setInterval(fetchAttemptTelemetry, 2500);
 }
 
 async function fetchPrisonerData() {
@@ -107,6 +116,59 @@ async function fetchPrisonerData() {
     }
 }
 
+async function fetchAttemptTelemetry() {
+    try {
+        const res = await fetch(`${API_BASE}/warden/attempts`, { credentials: 'include' });
+        if (!res.ok) {
+            if (res.status === 401) window.location.reload();
+            return;
+        }
+
+        const data = await res.json();
+        const summary = data.summary || {};
+        const recent = Array.isArray(data.recent) ? data.recent : [];
+
+        document.getElementById('stat-total-attempts').innerText = summary.total_attempts || 0;
+        document.getElementById('stat-correct-attempts').innerText = summary.correct_attempts || 0;
+        document.getElementById('stat-wrong-attempts').innerText = summary.wrong_attempts || 0;
+
+        const summaryHtml = [
+            `<div class="flex justify-between"><span>Total attempts</span><span class="text-amber-500 font-bold">${summary.total_attempts || 0}</span></div>`,
+            `<div class="flex justify-between"><span>Correct</span><span class="text-green-400 font-bold">${summary.correct_attempts || 0}</span></div>`,
+            `<div class="flex justify-between"><span>Wrong</span><span class="text-red-400 font-bold">${summary.wrong_attempts || 0}</span></div>`
+        ].join('');
+        const summaryBox = document.getElementById('warden-attempt-summary');
+        if (summaryBox) {
+            summaryBox.innerHTML = summaryHtml;
+        }
+
+        let feedHtml = '';
+        recent.forEach(row => {
+            const statusClass = row.correct ? 'text-green-400' : 'text-red-400';
+            const statusLabel = row.correct ? 'CORRECT' : 'WRONG';
+            feedHtml += `<div class="border-b border-amber-900/10 pb-2">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-amber-500 font-bold">${row.username}</span>
+                    <span class="${statusClass} font-bold">${statusLabel}</span>
+                </div>
+                <div class="text-amber-700">${row.room_name} :: ${row.submitted}</div>
+                <div class="text-[10px] text-amber-900">${new Date(row.attempted_at).toLocaleString()}</div>
+            </div>`;
+        });
+
+        if (!recent.length) {
+            feedHtml = '<div class="text-amber-500 italic">No attempts recorded yet.</div>';
+        }
+
+        const activityFeed = document.getElementById('activity-feed');
+        if (activityFeed) {
+            activityFeed.innerHTML = feedHtml;
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function resetPrisoner(username) {
     if (!confirm(`Are you sure you want to reset prisoner ${username}?`)) return;
     try {
@@ -119,6 +181,7 @@ async function resetPrisoner(username) {
         if (res.ok) {
             alert(`Prisoner ${username} reset successfully.`);
             fetchPrisonerData();
+            fetchAttemptTelemetry();
         }
     } catch (err) {
         alert('Failed to reset prisoner.');
@@ -132,6 +195,7 @@ async function resetAllGameSessions() {
         if (res.ok) {
             alert('ALL SESSIONS RESET.');
             fetchPrisonerData();
+            fetchAttemptTelemetry();
         }
     } catch (err) {
         alert('Failed to reset sessions.');

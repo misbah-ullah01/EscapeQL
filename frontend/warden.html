@@ -190,6 +190,30 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-3 gap-4 h-24">
+                    <div class="panel-border bg-surface-container-low p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs text-amber-700 font-bold">TOTAL_ATTEMPTS</span>
+                            <span class="material-symbols-outlined text-amber-500 text-sm">receipt_long</span>
+                        </div>
+                        <span id="stat-total-attempts" class="text-3xl font-black text-amber-500 crt-glow">0</span>
+                    </div>
+                    <div class="panel-border bg-surface-container-low p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs text-amber-700 font-bold">CORRECT_ATTEMPTS</span>
+                            <span class="material-symbols-outlined text-amber-500 text-sm">task_alt</span>
+                        </div>
+                        <span id="stat-correct-attempts" class="text-3xl font-black text-amber-500 crt-glow">0</span>
+                    </div>
+                    <div class="panel-border bg-surface-container-low p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs text-amber-700 font-bold">WRONG_ATTEMPTS</span>
+                            <span class="material-symbols-outlined text-amber-500 text-sm">warning</span>
+                        </div>
+                        <span id="stat-wrong-attempts" class="text-3xl font-black text-amber-500 crt-glow">0</span>
+                    </div>
+                </div>
                 
                 <!-- Player Data Grid -->
                 <div class="flex-1 panel-border bg-surface-container flex flex-col min-h-0">
@@ -218,26 +242,19 @@
 
             <!-- Right Column: Activity Log -->
             <div class="w-96 flex flex-col gap-4">
-                <!-- CCTV Feed Mock -->
-                <div class="h-48 panel-border bg-black relative overflow-hidden group border border-amber-900/50">
-                    <!-- Random static/noise for CCTV effect -->
-                    <div class="absolute inset-0 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgLBr82AggxYBDntgApUH7S2s9TBjHx_wizOpT7bER5CIwLnxex5XOe-AXMfZFtgMbeJoHVgteBMDyN3vkHLq0JKYBlL9M_dWD6lc_HYe5qfyysrA4YFBCiyQ3RViy2SlbWnvDK8CNfbvoG9JIegdW1xKxPXTuMek-mXUmZ1-O3_uBhu6JRFjXbp98ANAPBhN2YvttNuM7D_MAORA54OJSuLU-sR6lPkY6a4Faz4yUAbe3Fp26CF76eyqLaMhmUNRA1z7Vqi_uh8c')] opacity-30 mix-blend-screen"></div>
-                    <div class="absolute top-2 left-2 flex flex-col">
-                        <span class="text-[8px] font-mono text-white bg-black/50 px-1">CAM_04_VAULT</span>
-                        <span id="cam-time" class="text-[8px] font-mono text-white bg-black/50 px-1"></span>
+                <div class="panel-border bg-surface-container-lowest p-4">
+                    <div class="flex items-center justify-between border-b border-amber-900/50 pb-2 mb-4">
+                        <span class="text-xs text-amber-500 font-black tracking-widest">LIVE_ATTEMPT_STREAM</span>
+                        <span id="cam-time" class="text-[8px] font-mono text-amber-700"></span>
                     </div>
-                    <div class="absolute top-2 right-2 flex items-center gap-1">
-                        <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                        <span class="text-[8px] font-bold text-white shadow-sm">LIVE</span>
-                    </div>
-                    <div class="absolute inset-0 flex items-center justify-center opacity-20">
-                        <span class="material-symbols-outlined text-6xl text-white">visibility</span>
+                    <div class="text-[11px] text-amber-700 space-y-2" id="warden-attempt-summary">
+                        <div>Waiting for attempt telemetry...</div>
                     </div>
                 </div>
 
                 <div class="flex-1 panel-border bg-surface-container flex flex-col min-h-0">
                     <div class="bg-amber-900/30 px-4 py-2 border-b border-amber-900/50">
-                        <span class="text-xs text-amber-500 font-black tracking-widest">REALTIME_ACTIVITY_FEED</span>
+                        <span class="text-xs text-amber-500 font-black tracking-widest">RECENT_ATTEMPTS</span>
                     </div>
                     <div id="activity-feed" class="flex-1 overflow-auto custom-scrollbar p-4 space-y-3 font-mono text-[11px]">
                         <!-- Feed populated by JS -->

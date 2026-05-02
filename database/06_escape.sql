@@ -33,10 +33,8 @@ DECLARE
     v_decrypted TEXT;
 BEGIN
     BEGIN
-        SELECT convert_from(
-            pgp_sym_decrypt(message, p_key),
-            'UTF8'
-        ) INTO v_decrypted
+        SELECT pgp_sym_decrypt(message, p_key)
+        INTO v_decrypted
         FROM escape.freedom;
     EXCEPTION WHEN OTHERS THEN
         RETURN json_build_object(

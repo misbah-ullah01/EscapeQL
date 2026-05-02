@@ -43,10 +43,7 @@ BEGIN
     IF NEW.status = 'AUTHORIZED' THEN
         UPDATE server_room.hatch
         SET open = TRUE, last_attempt = NOW()
-        WHERE clearance_id = NEW.clearance_id;
-        -- BUG: 'clearance_id' does not exist in either table
-        -- The correct column name is 'auth_id'
-        -- This will throw: ERROR: column "clearance_id" does not exist
+        WHERE hatch_id = 1;
     END IF;
     RETURN NEW;
 END;

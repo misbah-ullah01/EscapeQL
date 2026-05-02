@@ -41,10 +41,10 @@ DECLARE
     v_expected_hash TEXT;
     v_submitted_hash TEXT;
     v_fragment TEXT;
-    v_txn_level INT;
+    v_txn_level BOOLEAN;
 BEGIN
     -- Kept for teaching/discussion, even though the guard uses a session flag.
-    v_txn_level := current_setting('transaction_isolation', TRUE)::TEXT IS NOT NULL;
+    v_txn_level := current_setting('transaction_isolation', TRUE) IS NOT NULL;
 
     -- Players must set this flag inside BEGIN/COMMIT via vault.set_ready().
     IF current_setting('vault.transaction_ready', TRUE) IS DISTINCT FROM 'yes' THEN

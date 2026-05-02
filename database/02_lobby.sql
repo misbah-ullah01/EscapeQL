@@ -2,12 +2,6 @@ CREATE SCHEMA lobby;
 
 -- =================================================
 
--- Give prisoner access to lobby immediately
-GRANT USAGE ON SCHEMA lobby TO prisoner;
-GRANT SELECT ON ALL TABLES IN SCHEMA lobby TO prisoner;
-
--- =================================================
-
 -- Table: lobby.staff_directory
 -- The puzzle is hiding in the access_code column
 
@@ -136,4 +130,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION lobby.attempt_unlock(INT, TEXT) TO prisoner;
+
+GRANT USAGE ON SCHEMA lobby TO prisoner;
+GRANT SELECT ON ALL TABLES IN SCHEMA lobby TO prisoner;
 	

@@ -77,18 +77,18 @@
     </aside>
 
     <!-- Main Content Canvas -->
-    <main class="ml-64 mt-16 p-8 grid grid-cols-12 gap-6 h-[calc(100vh-64px)] bg-[#131318]">
+    <main class="ml-64 mt-16 p-8 grid grid-cols-12 gap-6 h-[calc(100vh-64px)] bg-[#131318] overflow-hidden min-h-0">
         
         <!-- CENTER PANEL: TERMINAL -->
-        <section class="col-span-8 flex flex-col gap-6">
-            <div class="flex-grow flex flex-col bg-black/80 border-2 border-primary-container rounded-none relative overflow-hidden crt-flicker">
+        <section class="col-span-8 flex flex-col gap-6 min-h-0">
+            <div class="flex-grow flex flex-col bg-black/80 border-2 border-primary-container rounded-none relative overflow-hidden crt-flicker min-h-0">
                 <div class="absolute inset-0 noise-bg pointer-events-none"></div>
                 <div class="bg-primary-container text-black px-4 py-1 flex justify-between items-center font-bold text-sm">
                     <span>SQL_TERMINAL_V1.0.4</span>
                 </div>
                 
                 <!-- Output Area -->
-                <div id="terminal-output" class="flex-grow p-6 text-primary-container overflow-y-auto custom-scrollbar text-sm space-y-2">
+                <div id="terminal-output" class="flex-grow min-h-0 p-6 text-primary-container overflow-y-auto custom-scrollbar text-sm space-y-2">
                     <div class="text-primary-container/70">Type SQL commands below and press RUN_QUERY.</div>
                 </div>
 
@@ -129,15 +129,23 @@
         </section>
 
         <!-- RIGHT PANEL: MODULES -->
-        <section class="col-span-4 flex flex-col gap-6">
+        <section class="col-span-4 flex flex-col gap-6 min-h-0">
             <!-- Room Guide / Hints -->
-            <div class="bg-black border border-primary-container p-4 crt-flicker flex-grow">
-                <div class="text-primary-container font-bold uppercase text-xs border-b border-primary-container/30 pb-2 mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">menu_book</span>
-                    ROOM_GUIDE
+            <div class="bg-black border border-primary-container p-4 crt-flicker flex-grow min-h-0 overflow-y-auto custom-scrollbar">
+                <div class="flex items-center justify-between gap-3 border-b border-primary-container/30 pb-2 mb-4">
+                    <div class="text-primary-container font-bold uppercase text-xs flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">menu_book</span>
+                        ROOM_GUIDE
+                    </div>
+                    <button id="hint-button" type="button" onclick="showNextHint()" class="hidden border border-primary-container text-primary-container px-3 py-1 uppercase font-bold text-[10px] hover:bg-primary-container/10 transition-all">
+                        REVEAL_HINT_1
+                    </button>
                 </div>
-                <div id="room-guide-content" class="space-y-4">
-                    <!-- Hints injected here -->
+                <div id="schema-structure" class="mb-5 p-3 border border-primary-container/20 bg-[#050505]">
+                    <div class="text-primary-container font-bold uppercase text-[10px] tracking-widest mb-3">SCHEMA_STRUCTURE</div>
+                    <div id="schema-structure-content" class="text-[11px] text-[#b9ccb2] leading-relaxed italic">Loading accessible objects...</div>
+                </div>
+                <div id="room-guide-content" class="space-y-4 pb-2">
                     <p class="text-[11px] text-[#b9ccb2] leading-relaxed italic">System connecting... gathering sector intel.</p>
                 </div>
             </div>

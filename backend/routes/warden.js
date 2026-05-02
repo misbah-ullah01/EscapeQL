@@ -49,6 +49,43 @@ router.get('/prisoners', requireWarden, async (req, res) => {
     }
 });
 
+router.get('/attempts', requireWarden, async (req, res) => {
+    try {
+        const summaryResult = await wardenPool.query(`
+            SELECT
+                COUNT(*)::INT AS total_attempts,
+                COUNT(*) FILTER (WHERE correct)::INT AS correct_attempts,
+                COUNT(*) FILTER (WHERE NOT correct)::INT AS wrong_attempts
+            FROM warden.attempt_log
+        `);
+
+        const recentResult = await wardenPool.query(`
+            SELECT
+                COALESCE(p.username, 'unknown') AS username,
+                a.room_name,
+                a.submitted,
+                a.correct,
+                a.attempted_at
+            FROM warden.attempt_log a
+            LEFT JOIN warden.players p ON p.player_id = a.player_id
+            ORDER BY a.attempted_at DESC, a.id DESC
+            LIMIT 25
+        `);
+
+        res.json({
+            summary: summaryResult.rows[0] || {
+                total_attempts: 0,
+                correct_attempts: 0,
+                wrong_attempts: 0
+            },
+            recent: recentResult.rows
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch attempts' });
+    }
+});
+
 router.post('/reset-prisoner', requireWarden, async (req, res) => {
     const { username } = req.body;
     if (!username) return res.status(400).json({ error: 'username required' });
