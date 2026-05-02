@@ -1,8 +1,5 @@
--- We use different Schemas as different "rooms" in the EscapeQL game
--- A schema is like a Folder inside a database
--- 'warden' schema is the hidden admin/control area
-
-CREATE SCHEMA IF NOT EXISTS warden;
+-- Create the warden schema (hidden admin area)
+CREATE SCHEMA warden;
 
 -- Security: Only warden role can access this schema
 REVOKE ALL ON SCHEMA warden FROM PUBLIC;
@@ -10,42 +7,46 @@ GRANT ALL ON SCHEMA warden TO warden;
 
 -- ===================================================
 
-CREATE TABLE IF NOT EXISTS warden.players (
+-- Stores every player account
+CREATE TABLE warden.players (
 	player_id 		SERIAL PRIMARY KEY,
 	username 		VARCHAR(50) UNIQUE NOT NULL,
-	created_at 		TIMESTAMPTZ DEFAULT NOW(),		-- TIMESTAMP TZ is timestamp with timezone
-	completed_at 	TIMESTAMPTZ,					-- NULL unitl they successfully escape
+	created_at 		TIMESTAMPTZ DEFAULT NOW(),
+	completed_at 	TIMESTAMPTZ,
 	current_room 	VARCHAR(50) DEFAULT 'lobby',
 	is_active 		BOOLEAN DEFAULT TRUE
 );
 
 -- ===================================================
 
-CREATE TABLE IF NOT EXISTS warden.room_log(
+-- Audit trail: every room completion is recorded here
+CREATE TABLE warden.room_log(
 	log_id 		SERIAL PRIMARY KEY,
-	player_id 	INT NOT NULL REFERENCES warden.players(player_id),	--Foerign Key
+	player_id 	INT NOT NULL REFERENCES warden.players(player_id),
 	room_name 	VARCHAR(50) NOT NULL,
 	solved_at 	TIMESTAMPTZ DEFAULT NOW(),
 	attempts 	INT DEFAULT 1,
-	time_taken 	INTERVAL		-- Example: '00:12:23' (Hours:minute:seconds)
+	time_taken 	INTERVAL
 );
 
 -- ===================================================
 
-CREATE TABLE IF NOT EXISTS warden.answers (
+-- Stores hashed answers for each room
+CREATE TABLE warden.answers (
 	room_name 				VARCHAR(50) PRIMARY KEY,
-	answer_hash 			TEXT NOT NULL,			-- SHA-256 hash of the real answer
-	unlock_target 			VARCHAR(50) NOT NULL,	-- which schema/room to unclock on success
-	key_fragments 			VARCHAR(50) NOT NULL	-- Piece of the final escape key
+	answer_hash 			TEXT NOT NULL,
+	unlock_target 			VARCHAR(50) NOT NULL,
+	key_fragment 			VARCHAR(100) NOT NULL
 );
 
 -- ===================================================
 
-CREATE TABLE IF NOT EXISTS warden.attempt_log (
+-- Records every unlock attempt (correct or wrong)
+CREATE TABLE warden.attempt_log (
 	id 				SERIAL PRIMARY KEY,
 	player_id 		INT REFERENCES warden.players(player_id),
 	room_name 		VARCHAR(50),
-	submitted 		TEXT,			-- What players actually typed
+	submitted 		TEXT,
 	correct 		BOOLEAN,
 	attempted_at 	TIMESTAMPTZ DEFAULT NOW()
 );
@@ -62,21 +63,20 @@ ON CONFLICT (room_name) DO NOTHING;
 
 -- ===================================================
 
--- Now to give warden full permission on everything we created
+-- Give warden permissions on everything created in this schema
 
 GRANT ALL ON ALL TABLES IN SCHEMA warden TO warden;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA warden TO warden;
 
 -- ===================================================
 
-CREATE OR REPLACE VIEW warden.player_progress AS 
+-- Optional presentation helper view for quick status checks
+CREATE OR REPLACE VIEW warden.player_progress AS
 SELECT
-	p.username,
-	p.current_room,
-	(p.completed_at IS NOT NULL) AS has_escaped,
-	COUNT(rl.log_id) AS rooms_completed
+    p.username,
+    p.current_room,
+    (p.completed_at IS NOT NULL) AS has_escaped,
+    COUNT(rl.log_id) AS rooms_completed
 FROM warden.players p
 LEFT JOIN warden.room_log rl ON rl.player_id = p.player_id
 GROUP BY p.player_id, p.username, p.current_room, p.completed_at;
-
--- ===================================================

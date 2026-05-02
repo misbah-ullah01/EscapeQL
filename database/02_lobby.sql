@@ -1,6 +1,4 @@
--- File: database/02_lobby.sql
-
-CREATE SCHEMA LOBBY;
+CREATE SCHEMA lobby;
 
 -- =================================================
 
@@ -10,12 +8,12 @@ GRANT SELECT ON ALL TABLES IN SCHEMA lobby TO prisoner;
 
 -- =================================================
 
---Table: lobby.staff_directory
--- The puzzle is hiding in the access_code colums
+-- Table: lobby.staff_directory
+-- The puzzle is hiding in the access_code column
 
 CREATE TABLE lobby.staff_directory (
 	staff_id	SERIAL PRIMARY KEY,
-	name 		VARCHAR(50) NOT NULL,
+	name 		VARCHAR(100) NOT NULL,
 	department 	VARCHAR(50),
 	access_code	VARCHAR(20),
 	clue		TEXT,
@@ -26,12 +24,12 @@ CREATE TABLE lobby.staff_directory (
 
 -- The column comment IS the first clue
 -- Player can read it with: \d+ lobby.staff_directory
-COMMENT ON COLUMN Lobby.staff_directory.access_code
+COMMENT ON COLUMN lobby.staff_directory.access_code
 	IS 'The one who left no trace knows the way.';
 
 -- =================================================
 
--- Table: lobby.hint_borad
+-- Table: lobby.hint_board
 -- Contains the passphrase once you know who to look for
 
 CREATE TABLE lobby.hint_board (
@@ -68,7 +66,7 @@ VALUES
 	 'MARCUS_VOID_KNOWS');
 
 -- =================================================
--- Function for lobby attep on unlock by player
+-- Function for lobby attempt on unlock by player
 
 CREATE OR REPLACE FUNCTION lobby.attempt_unlock(
 	p_player_id INT,
@@ -81,7 +79,7 @@ DECLARE
 	v_submitted_hash TEXT;
 	v_fragment TEXT;
 BEGIN
-	-- Get the expexted hash from Warden
+	-- Get the expected hash from warden
 	SELECT answer_hash, key_fragment
 	INTO v_expected_hash, v_fragment
 	FROM warden.answers
@@ -100,7 +98,7 @@ BEGIN
 		EXECUTE 'GRANT USAGE ON SCHEMA corridor TO prisoner';
 		EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA corridor TO prisoner';
 	
-		-- Log the room completeion
+		-- Log the room completion
 		INSERT INTO warden.room_log (player_id, room_name)
 		VALUES (p_player_id, 'lobby')
 		ON CONFLICT DO NOTHING;
@@ -122,7 +120,7 @@ BEGIN
 		);
 	
 		RETURN json_build_object(
-			'succes', TRUE,
+			'success', TRUE,
 			'message', 'Correct. The corridor is open.',
 			'fragment', v_fragment,
 			'next_room', 'corridor'

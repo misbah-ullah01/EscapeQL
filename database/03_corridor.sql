@@ -1,20 +1,16 @@
--- File: database/03_corridor.sql
-
 CREATE SCHEMA corridor;
+-- Access is granted only after lobby is solved.
 
--- =================================================
-
+-- Base table with ALL doors including the hidden one.
 CREATE TABLE corridor.door_log (
     door_id     SERIAL PRIMARY KEY,
     location    VARCHAR(100) NOT NULL,
     status      VARCHAR(20) DEFAULT 'LOCKED',
-    active      BOOLEAN DEFAULT TRUE,   -- door 7 is false
+    active      BOOLEAN DEFAULT TRUE,
     secret_code VARCHAR(50)
 );
 
--- =================================================
-
-CREATE TABLE corridor.maintenance_ntoes (
+CREATE TABLE corridor.maintenance_notes (
     note_id     SERIAL PRIMARY KEY,
     door_id     INT REFERENCES corridor.door_log(door_id),
     note_text   TEXT,
@@ -22,24 +18,14 @@ CREATE TABLE corridor.maintenance_ntoes (
     note_date   DATE DEFAULT CURRENT_DATE
 );
 
--- =================================================
-
 CREATE VIEW corridor.camera_feeds AS
-    SELECT door_id, location, status
-    FROM corridor.door_log
-    WHERE active = TRUE;
-
--- the player will notice door 7 is missing after counting
--- They inpect: SELECT definition FROM pg_views WHERE viewname='camera_feeds'
--- they see the where claude and realize they need the base table
+SELECT door_id, location, status
+FROM corridor.door_log
+WHERE active = TRUE;
+-- Puzzle hook: this WHERE clause hides door 7 from normal view.
 
 COMMENT ON VIEW corridor.camera_feeds
     IS 'Live feed from all active corridor cameras.';
-
--- This comment sounds innocent. It is misdirection.
--- the word "active" in the comment is the hint if they read carefully
-
--- =================================================
 
 INSERT INTO corridor.door_log (location, status, active, secret_code) VALUES
     ('North Wing A',    'LOCKED',    TRUE,  NULL),
@@ -49,12 +35,10 @@ INSERT INTO corridor.door_log (location, status, active, secret_code) VALUES
     ('Emergency Exit',  'LOCKED',    TRUE,  NULL),
     ('Basement Access', 'LOCKED',    TRUE,  NULL),
     ('Maintenance Bay', 'UNLOCKED',  FALSE, 'DOOR_SEVEN_FOUND'),
-    -- ^^^ Door 7 is active=FALSE and has the secret code
+    -- Door 7 is intentionally inactive and contains the code.
     ('South Hallway',   'LOCKED',    TRUE,  NULL),
     ('West Wing',       'LOCKED',    TRUE,  NULL),
     ('Archive Room',    'LOCKED',    TRUE,  NULL);
-
--- =================================================
 
 INSERT INTO corridor.maintenance_notes (door_id, note_text, technician, note_date) VALUES
     (1,  'Routine check. All clear.',            'T. Brown',   '2024-01-10'),
@@ -64,14 +48,11 @@ INSERT INTO corridor.maintenance_notes (door_id, note_text, technician, note_dat
     (5,  'Emergency bar tested.',                'T. Brown',   '2024-01-14'),
     (6,  'Basement access restricted.',          'Management', '2024-01-15'),
     (7,  'Door decommissioned. Do not use.',     'Unknown',    '2024-01-01'),
-    -- ^^^ The "Unknown" technician and "decommissioned" is another hint
+    -- Extra hint: Unknown technician + decommissioned wording.
     (8,  'Routine check.',                       'K. Mills',   '2024-01-16'),
     (9,  'Lock serviced.',                       'T. Brown',   '2024-01-17'),
     (10, 'Archive sealed per policy directive.', 'Management', '2024-01-18');
 
--- =================================================
-
--- Unlock feature for corridor
 CREATE OR REPLACE FUNCTION corridor.attempt_unlock(
     p_player_id INT,
     p_code TEXT
@@ -80,44 +61,59 @@ RETURNS JSON AS $$
 DECLARE
     v_expected_hash TEXT;
     v_submitted_hash TEXT;
-    v_fragment TEXT
+    v_fragment TEXT;
 BEGIN
-    SELECT answer_hash, key_fragments INTO v_expected_hash, v_fragment
-    FROM warden.answers WHERE room_name = 'corridor';
+    SELECT answer_hash, key_fragment
+    INTO v_expected_hash, v_fragment
+    FROM warden.answers
+    WHERE room_name = 'corridor';
 
     v_submitted_hash := encode(digest(p_code, 'sha256'), 'hex');
 
-    INSERT INTO warden.attempt_log (p_player_id, room_name, submitted_correct)
+    INSERT INTO warden.attempt_log (player_id, room_name, submitted, correct)
     VALUES (p_player_id, 'corridor', p_code, v_submitted_hash = v_expected_hash);
 
     IF v_submitted_hash = v_expected_hash THEN
+        -- Unlock next room privileges after correct submission.
         EXECUTE 'GRANT USAGE ON SCHEMA vault TO prisoner';
         EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA vault TO prisoner';
         EXECUTE 'GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA vault TO prisoner';
 
         INSERT INTO warden.room_log (player_id, room_name)
-        VALUES (p_player_id, 'corridor') ON CONFLICT DO NOTHING;
+        VALUES (p_player_id, 'corridor')
+        ON CONFLICT DO NOTHING;
 
-        UPDATE warden.players SET current_room = 'vault'
+        UPDATE warden.players
+        SET current_room = 'vault'
         WHERE player_id = p_player_id;
 
-        PERFORM pg_notify('room_unlocked',
-            json_build_object('player_id', p_player_id,
-            'room', 'corridor', 'at', NOW())::TEXT);
+        PERFORM pg_notify(
+            'room_unlocked',
+            json_build_object(
+                'player_id', p_player_id,
+                'room', 'corridor',
+                'at', NOW()
+            )::TEXT
+        );
 
-        RETURN json_build_object('success', TRUE,
+        RETURN json_build_object(
+            'success', TRUE,
             'message', 'The vault door slides open.',
-            'fragment', v_fragment, 'nect_room', 'vault');
+            'fragment', v_fragment,
+            'next_room', 'vault'
+        );
     ELSE
-        RETURN json_build_object('success', FALSE,
-            'message', 'The corridor stays dark.', 'fragment', NUL);
+        RETURN json_build_object(
+            'success', FALSE,
+            'message', 'The corridor stays dark.',
+            'fragment', NULL
+        );
     END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION corridor.attempt_unclock(INT, TEXT) TO prisoner;
+GRANT EXECUTE ON FUNCTION corridor.attempt_unlock(INT, TEXT) TO prisoner;
 
--- Grant prisoner read access to pg_views (needed to solve this puzzle)
 GRANT SELECT ON pg_views TO prisoner;
 
 
